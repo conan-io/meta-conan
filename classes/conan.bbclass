@@ -25,7 +25,7 @@ def map_yocto_arch_to_conan_arch(d, arch_var):
            "cortexa8hf-neon": "armv7hf",
            "arm": "armv7hf",
            "i586": "x86",
-	   "i686": "x86",
+           "i686": "x86",
            "mips32r2": "mips",
            "mips64": "mips64",
            "ppc7400": "ppc32"
