@@ -16,6 +16,8 @@ With this layer you can write simple Bitbake recipes to retrieve and deploy Cona
     CONAN_PKG = "mosquitto/1.4.15@bincrafters/stable"
 ````
 
+Read how to use this layer in the Conan documentation: https://docs.conan.io/en/latest/integrations/cross_platform/yocto.html
+
 Requirements
 ------------
 
