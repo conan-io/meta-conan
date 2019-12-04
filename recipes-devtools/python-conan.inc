@@ -63,7 +63,6 @@ DEPENDS_class-native = "\
     ${PYTHON_PN}-tqdm-native \
     ${PYTHON_PN}-jinja2-native \
     ${PYTHON_PN}-native \
-    ${PYTHON_PN}-dateutil-native \
 "
 
 # Fix python-requests
