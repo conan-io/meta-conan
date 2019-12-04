@@ -42,6 +42,7 @@ RDEPENDS_${PN} = "\
     ${PYTHON_PN}-tqdm \
     ${PYTHON_PN}-jinja2 \
     ${PYTHON_PN}-sqlite3 \
+    ${PYTHON_PN}-dateutil \ 
 "
 
 DEPENDS_class-native = "\
