@@ -10,6 +10,7 @@ SRC_URI[sha256sum] = "427c76773fe036ddfa41e57d89086ea03111bbac57c55fc55f3006d027
 RDEPENDS_${PN} = "\
     ${PYTHON_PN}-six \
     ${PYTHON_PN}-monotonic \
+    ${PYTHON_PN}-fcntl \
 "
 
 DEPENDS_class-native = "\

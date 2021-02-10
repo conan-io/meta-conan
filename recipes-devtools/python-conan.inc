@@ -41,8 +41,26 @@ RDEPENDS_${PN} = "\
     ${PYTHON_PN}-deprecation \
     ${PYTHON_PN}-tqdm \
     ${PYTHON_PN}-jinja2 \
+    ${PYTHON_PN}-dateutil \
+    ${PYTHON_PN}-codecs \
+    ${PYTHON_PN}-ctypes \
+    ${PYTHON_PN}-datetime \
+    ${PYTHON_PN}-difflib \
+    ${PYTHON_PN}-io \
+    ${PYTHON_PN}-json \
+    ${PYTHON_PN}-logging \
+    ${PYTHON_PN}-math \
+    ${PYTHON_PN}-multiprocessing \
+    ${PYTHON_PN}-pickle \
     ${PYTHON_PN}-sqlite3 \
+    ${PYTHON_PN}-threading \
+    ${PYTHON_PN}-xml \
 "
+
+# This package uses pthreads so make sure to include libgcc
+# https://bugzilla.yoctoproject.org/show_bug.cgi?id=10954
+
+RDEPENDS_${PN} += " libgcc"
 
 DEPENDS_class-native = "\
     ${PYTHON_PN}-pyjwt-native \
@@ -62,6 +80,7 @@ DEPENDS_class-native = "\
     ${PYTHON_PN}-tqdm-native \
     ${PYTHON_PN}-jinja2-native \
     ${PYTHON_PN}-native \
+    ${PYTHON_PN}-dateutil-native \
 "
 
 # Fix python-requests
@@ -79,6 +98,11 @@ DEPENDS_class-native += "\
 # Fix python-jinja2
 DEPENDS_class-native += "\
     ${PYTHON_PN}-markupsafe-native \
+"
+
+# Fix python-dateutil
+DEPENDS_class-native += "\
+    ${PYTHON_PN}-setuptools-scm-native \
 "
 
 ALTERNATIVE_${PN} += "conan"
