@@ -1,6 +1,7 @@
 S = "${WORKDIR}"
 export CONAN_USER_HOME = "${WORKDIR}"
 export CONAN_NON_INTERACTIVE = "1"
+export CONAN_REVISIONS_ENABLED = "1"
 
 DEPENDS += " python3-conan-native"
 
