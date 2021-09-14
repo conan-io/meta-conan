@@ -74,10 +74,12 @@ EOF
     echo ${CONAN_PROFILE_PATH}
     conan profile show ${CONAN_PROFILE_PATH}
 
-    for NAME in ${CONAN_REMOTE_NAME}
-    do
-        conan user -p ${CONAN_PASSWORD} -r ${NAME} ${CONAN_USER}
-    done
+    if [ "${CONAN_USER}" ]; then
+        for NAME in ${CONAN_REMOTE_NAME}
+        do
+            conan user -p ${CONAN_PASSWORD} -r ${NAME} ${CONAN_USER}
+        done
+    fi
     conan install ${CONAN_PKG} --profile ${CONAN_PROFILE_PATH} -if ${D}
     rm -f ${D}/deploy_manifest.txt
 }
