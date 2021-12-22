@@ -1,0 +1,18 @@
+name: yocto_check_layer
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+
+      - name: "Setup"
+        run: |
+          mkdir /tmp/yocto
+          git clone git://git.yoctoproject.org/poky -b dunfell /tmp/yocto/poky
+          git clone https://github.com/openembedded/meta-openembedded.git -b dunfell /tmp/yocto/poky/meta-openembedded
+      - name: "Validate Yocto layers"
+        working-directory: /tmp/yocto
+        run: |
+          source poky/oe-init-build-env
