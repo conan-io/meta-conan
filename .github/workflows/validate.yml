@@ -1,17 +1,20 @@
 name: yocto_check_layer
 on: [push, pull_request]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+    env:
+      YOCTO_RELEASE: dunfell
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
 
       - name: "Setup"
         run: |
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
           mkdir /tmp/yocto
-          git clone git://git.yoctoproject.org/poky -b dunfell /tmp/yocto/poky
-          git clone https://github.com/openembedded/meta-openembedded.git -b dunfell /tmp/yocto/poky/meta-openembedded
+          git clone git://git.yoctoproject.org/poky -b ${YOCTO_RELEASE} /tmp/yocto/poky
+          git clone https://github.com/openembedded/meta-openembedded.git -b ${YOCTO_RELEASE} /tmp/yocto/poky/meta-openembedded
       - name: "Validate Yocto layers"
         working-directory: /tmp/yocto
         run: |
