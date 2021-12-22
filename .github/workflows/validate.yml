@@ -18,5 +18,5 @@ jobs:
         working-directory: /tmp/yocto
         run: |
           source poky/oe-init-build-env
-          cd /tmp/yocto/meta-openembedded
+          cd /tmp/yocto/poky/meta-openembedded
           yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${GITHUB_WORKSPACE}
