@@ -8,8 +8,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-
-      - name: "Setup"
+      - name: "Install APT packages"
+        run: sudo apt-get -y --no-install-recommends diffstat
+      - name: "Setup Yocto layers"
         run: |
           mkdir /tmp/yocto
           git clone --depth 1 git://git.yoctoproject.org/poky -b ${YOCTO_RELEASE} /tmp/yocto/poky
