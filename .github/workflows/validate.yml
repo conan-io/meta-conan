@@ -12,10 +12,11 @@ jobs:
       - name: "Setup"
         run: |
           mkdir /tmp/yocto
-          git clone git://git.yoctoproject.org/poky -b ${YOCTO_RELEASE} /tmp/yocto/poky
-          git clone https://github.com/openembedded/meta-openembedded.git -b ${YOCTO_RELEASE} /tmp/yocto/poky/meta-openembedded
+          git clone --depth 1 git://git.yoctoproject.org/poky -b ${YOCTO_RELEASE} /tmp/yocto/poky
+          git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${YOCTO_RELEASE} /tmp/yocto/poky/meta-openembedded
       - name: "Validate Yocto layers"
         working-directory: /tmp/yocto
         run: |
           source poky/oe-init-build-env
-          yocto-check-layer -d --dependency meta-openembedded/meta-oe meta-openembedded/meta-python --with-software-layer-signature-check ${GITHUB_WORKSPACE}
+          cd /tmp/yocto/meta-openembedded
+          yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${GITHUB_WORKSPACE}
