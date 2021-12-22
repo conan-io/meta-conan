@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
       - name: "Install APT packages"
-        run: sudo apt-get -y --no-install-recommends diffstat
+        run: sudo apt-get install -y --no-install-recommends diffstat
       - name: "Setup Yocto layers"
         run: |
           mkdir /tmp/yocto
