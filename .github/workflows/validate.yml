@@ -18,4 +18,5 @@ jobs:
       - name: "Validate Yocto layers"
         working-directory: /tmp/yocto
         run: |
+          echo "GITHUB_WORKSPACE: ${GITHUB_WORKSPACE}"
           source poky/oe-init-build-env
