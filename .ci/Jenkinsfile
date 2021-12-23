@@ -1,0 +1,25 @@
+pipeline {
+    agent none
+    stages {
+        stage("Linux") {
+            failFast true
+            parallel {
+                stage('Linux - validate') {
+                    agent {
+                        label 'Linux'
+                    }
+                    stages {
+                        stage('Linux - validate - clone dependencies') {
+                            environment {
+                                PYVER = 'py38'
+                            }
+                            steps {
+                                sh 'echo HELLO WORLD!'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
