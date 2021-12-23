@@ -15,10 +15,10 @@ node('Linux') {
             image.inside {
                 sh '''
                     WORKSPACE=${PWD}
-                    git clone --depth 1 git://git.yoctoproject.org/poky -b dunfell /tmp/poky
-                    git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b dunfell /tmp/meta-openembedded
+                    runuser -u conan -- git clone --depth 1 git://git.yoctoproject.org/poky -b dunfell /tmp/poky
+                    runuser -u conan -- git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b dunfell /tmp/meta-openembedded
                     cd /tmp/poky/
-                    . /tmp/poky/oe-init-build-env
+                    runuser -u conan -- . /tmp/poky/oe-init-build-env
                     cd /tmp/meta-openembedded
                     runuser -u conan -- yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${WORKSPACE}
                 '''
