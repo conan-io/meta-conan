@@ -7,7 +7,7 @@ node('Linux') {
 
     def image = null
     stage('Build docker image') {
-        image = docker.build('meta-conan', '-f .ci/Dockerfile .')
+        image = docker.build('meta-conan-build', '-f .ci/Dockerfile .')
     }
 
     stage('Validate Yocto layer') {
