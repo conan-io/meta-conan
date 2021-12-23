@@ -16,8 +16,6 @@ pipeline {
                             steps {
                                 sh '''
                                     TEMPDIR=$(mktemp -d -q)
-                                    git clone git://git.yoctoproject.org/poky -b dunfell ${TEMPDIR}/poky
-                                    git clone https://github.com/openembedded/meta-openembedded.git -b dunfell ${TEMPDIR}/poky/meta-openembedded
                                     git clone --depth 1 git://git.yoctoproject.org/poky -b ${YOCTO_RELEASE} ${TEMPDIR}/poky
                                     git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${YOCTO_RELEASE} /tmp/yocto/poky/meta-openembedded
                                     source ${TEMPDIR}/poky/oe-init-build-env
