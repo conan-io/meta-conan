@@ -19,6 +19,7 @@ node('Linux') {
                 git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b dunfell /tmp/meta-openembedded
                 cd /tmp/poky/
                 . /tmp/poky/oe-init-build-env
+                touch conf/sanity.conf
                 cd /tmp/meta-openembedded
                 yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${WORKSPACE}
             '''
