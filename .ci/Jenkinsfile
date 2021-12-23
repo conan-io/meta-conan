@@ -7,11 +7,11 @@ node('Linux') {
 
     def image = null
     stage('Build docker image') {
-        docker.build('meta-conan-validate', '-f .ci/Dockerfile .')
+        image = docker.build('meta-conan-validate', '-f .ci/Dockerfile .')
     }
 
     stage('Validate Yocto layer') {
-        docker.image(meta-conan-validate).inside() {
+        image(meta-conan-validate).inside() {
             sh '''
                 whoami
                 WORKSPACE=${PWD}
