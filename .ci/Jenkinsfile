@@ -4,17 +4,26 @@ pipeline {
         stage("Linux") {
             failFast true
             parallel {
-                stage('Linux - validate') {
+                stage('Validation') {
                     agent {
                         label 'Linux'
                     }
                     stages {
-                        stage('Linux - validate - clone dependencies') {
+                        stage('Linux - Validate ') {
                             environment {
-                                PYVER = 'py38'
+                                YOCTO_RELEASE = 'dunfell'
                             }
                             steps {
-                                sh 'echo HELLO WORLD!'
+                                sh '''
+                                    TEMPDIR=$(mktemp -d -q)
+                                    git clone git://git.yoctoproject.org/poky -b dunfell ${TEMPDIR}/poky
+                                    git clone https://github.com/openembedded/meta-openembedded.git -b dunfell ${TEMPDIR}/poky/meta-openembedded
+                                    git clone --depth 1 git://git.yoctoproject.org/poky -b ${YOCTO_RELEASE} ${TEMPDIR}/poky
+                                    git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${YOCTO_RELEASE} /tmp/yocto/poky/meta-openembedded
+                                    source ${TEMPDIR}/poky/oe-init-build-env
+                                    cd ${TEMPDIR}/poky/meta-openembedded
+                                    yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${GITHUB_WORKSPACE}
+                                '''
                             }
                         }
                     }
