@@ -17,11 +17,11 @@ pipeline {
                                 sh '''
                                     TEMPDIR=$(mktemp -d -q)
                                     git clone --depth 1 git://git.yoctoproject.org/poky -b ${YOCTO_RELEASE} ${TEMPDIR}/poky
-                                    git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${YOCTO_RELEASE} /tmp/yocto/poky/meta-openembedded
+                                    git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${YOCTO_RELEASE} ${TEMPDIR}/poky/meta-openembedded
                                     cd ${TEMPDIR}/poky
-                                    . oe-init-build-env
+                                    . ${TEMPDIR}/poky/oe-init-build-env
                                     cd ${TEMPDIR}/poky/meta-openembedded
-                                    yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${GITHUB_WORKSPACE}
+                                    yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${WORKSPACE}
                                 '''
                             }
                         }
