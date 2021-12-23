@@ -11,7 +11,7 @@ node('Linux') {
     }
 
     stage('Validate Yocto layer') {
-        image.inside("-u conan") {
+        image.inside("-u conan:_1001") {
             sh '''
                 whoami
                 WORKSPACE=${PWD}
