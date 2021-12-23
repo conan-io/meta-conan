@@ -12,11 +12,8 @@ node('Linux') {
 
     stage('Validate Yocto layer') {
         validate: {
-            image.withRun('-u conan') {
-                sh '''
-                    whoami \
-                    && su conan \
-                    && whoami \
+            image.inside('-u conan') {
+                sh 'whoami  && su conan && whoami
                     && WORKSPACE=${PWD} \
                     && git clone --depth 1 git://git.yoctoproject.org/poky -b dunfell /tmp/poky \
                     && git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b dunfell /tmp/meta-openembedded \
