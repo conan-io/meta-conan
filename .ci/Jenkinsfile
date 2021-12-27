@@ -21,7 +21,7 @@ node('Linux') {
                 . /tmp/poky/oe-init-build-env
                 touch conf/sanity.conf
                 cd /tmp/meta-openembedded
-                yocto-check-layer -d ${WORKSPACE} --dependency meta-oe meta-python
+                yocto-check-layer -d ${WORKSPACE} --dependency meta-oe meta-python --without-software-layer-signature-check
             '''
         }
     }
