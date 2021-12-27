@@ -12,6 +12,9 @@ RUN apt-get -qq update \
        file \
        gawk \
        wget \
+       lz4c \
+       pzstd \
+       zstd \
     && groupadd _1001 -g 1001 \
     && groupadd _1000 -g 1000 \
     && groupadd _2000 -g 2000 \
