@@ -1,4 +1,6 @@
-# meta-conan
+# Meta Conan
+
+[![Build Status](https://ci.conan.io/job/meta-conan/job/master/badge/icon)](https://ci.conan.io/job/meta-conan/job/master/)
 
 Introduction
 ------------
@@ -24,3 +26,7 @@ Requirements
 This layer depends on the `meta-python` layer: https://layers.openembedded.org/layerindex/branch/thud/layer/meta-python/
 
 ASDASDASDASDASD
+
+License
+-------
+[MIT](https://github.com/conan-io/conan/blob/develop/LICENSE.md)
