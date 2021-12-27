@@ -5,6 +5,7 @@ RUN apt-get -qq update \
     && apt-get -qq install -y --no-install-recommends --no-install-suggests \
        git \
        python3 \
+       python3-dev \
        build-essential \
        chrpath \
        cpio \
@@ -14,6 +15,10 @@ RUN apt-get -qq update \
        wget \
        lz4 \
        zstd \
+       sudo \
+       locales \
+    && locale-gen en_US.UTF-8 \
+    && update-locale LANG=en_US.UTF-8 \
     && groupadd _1001 -g 1001 \
     && groupadd _1000 -g 1000 \
     && groupadd _2000 -g 2000 \
