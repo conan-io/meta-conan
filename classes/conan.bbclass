@@ -6,7 +6,7 @@ export CONAN_REVISIONS_ENABLED = "1"
 DEPENDS += " python3-conan-native"
 
 # Need this because we do not use GNU_HASH in the conan builds
-# INSANE_SKIP_${PN} = "ldflags"
+# INSANE_SKIP:${PN} = "ldflags"
 
 CONAN_REMOTE_URL ?= ""
 CONAN_REMOTE_NAME ?= "conan-yocto"
