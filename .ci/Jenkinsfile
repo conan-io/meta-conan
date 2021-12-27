@@ -1,0 +1,28 @@
+#!groovy​
+
+node('Linux') {
+    stage('Clone sources') {
+        checkout scm
+    }
+
+    def image = null
+    stage('Build docker image') {
+        image = docker.build('meta-conan-validate', '-f .ci/Dockerfile .')
+    }
+
+    stage('Validate Yocto layer') {
+        image.inside {
+            sh '''
+                whoami
+                WORKSPACE=${PWD}
+                git clone --depth 1 git://git.yoctoproject.org/poky -b dunfell /tmp/poky
+                git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b dunfell /tmp/meta-openembedded
+                cd /tmp/poky/
+                . /tmp/poky/oe-init-build-env
+                touch conf/sanity.conf
+                cd /tmp/meta-openembedded
+                yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${WORKSPACE}
+            '''
+        }
+    }
+}

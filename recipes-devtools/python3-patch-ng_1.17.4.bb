@@ -8,4 +8,8 @@ SRC_URI[sha256sum] = "627abc5bd723c8b481e96849b9734b10065426224d4d22cd44137004ac
 
 inherit setuptools3 python3-dir pypi
 
+# This is packaged poorly
+#PYPI_PACKAGE_EXT = "zip"
+#S = "${WORKDIR}"
+
 BBCLASSEXTEND = "native nativesdk"

@@ -41,12 +41,19 @@ conan_do_install() {
         echo ${CONAN_CONFIG_URL}
         conan config install ${CONAN_CONFIG_URL}
     fi
-    if [ ${CONAN_REMOTE_URL} ]; then
+    if [ "${CONAN_REMOTE_URL}" ]; then
+        num_of_urls=$( echo ${CONAN_REMOTE_URL} | wc -w )
+        num_of_names=$( echo ${CONAN_REMOTE_NAME} | wc -w )
+        if [ ${num_of_urls} -ne ${num_of_names} ]; then
+            echo "ERROR: number of CONAN_REMOTE_URLs does not equal number of CONAN_REMOTE_NAMEs"
+            echo "${num_of_urls} CONAN_REMOTE_URLs given"
+            echo "${num_of_names} CONAN_REMOTE_NAMEs given"
+            exit 1
+        fi
         echo "Configuring the Conan remote:"
-        echo ${CONAN_REMOTE_URL}
-        conan remote add ${CONAN_REMOTE_NAME} ${CONAN_REMOTE_URL}
+        awk 'BEGIN{split("${CONAN_REMOTE_NAME}",a) split("${CONAN_REMOTE_URL}", b); for (i in a)
+            system("conan remote add " a[i] " " b[i]) }'
     fi
-
     mkdir -p ${WORKDIR}/profiles
     ${CC} -dumpfullversion | {
     IFS=. read major minor patch
@@ -67,8 +74,11 @@ EOF
     echo ${CONAN_PROFILE_PATH}
     conan profile show ${CONAN_PROFILE_PATH}
 
-    conan user -p ${CONAN_PASSWORD} -r ${CONAN_REMOTE_NAME} ${CONAN_USER}
-    conan install ${CONAN_PKG} --remote ${CONAN_REMOTE_NAME} --profile ${CONAN_PROFILE_PATH} -if ${D}
+    for NAME in ${CONAN_REMOTE_NAME}
+    do
+        conan user -p ${CONAN_PASSWORD} -r ${NAME} ${CONAN_USER}
+    done
+    conan install ${CONAN_PKG} --profile ${CONAN_PROFILE_PATH} -if ${D}
     rm -f ${D}/deploy_manifest.txt
 }
 
