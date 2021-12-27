@@ -15,8 +15,8 @@ node('Linux') {
             sh '''
                 whoami
                 WORKSPACE=${PWD}
-                git clone --depth 1 git://git.yoctoproject.org/poky -b dunfell /tmp/poky
-                git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b dunfell /tmp/meta-openembedded
+                git clone --depth 1 git://git.yoctoproject.org/poky -b honister /tmp/poky
+                git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b honister /tmp/meta-openembedded
                 cd /tmp/poky/
                 . /tmp/poky/oe-init-build-env
                 touch conf/sanity.conf
