@@ -4,7 +4,7 @@ FROM ubuntu:20.04
 RUN apt-get -qq update \
     && apt-get -qq install -y --no-install-recommends --no-install-suggests \
        git \
-       python3 \
+       python2-dev \
        python3-dev \
        build-essential \
        chrpath \
