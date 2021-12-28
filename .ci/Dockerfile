@@ -1,6 +1,9 @@
 FROM ubuntu:20.04
 
 
+ENV DEBIAN_FRONTEND=noninteractive \
+    TZ=Etc/UTC
+
 RUN apt-get -qq update \
     && apt-get -qq install -y --no-install-recommends --no-install-suggests \
        git \
@@ -17,6 +20,7 @@ RUN apt-get -qq update \
        zstd \
        sudo \
        locales \
+       texinfo \
     && locale-gen en_US.UTF-8 \
     && update-locale LANG=en_US.UTF-8 \
     && groupadd _1001 -g 1001 \
