@@ -62,6 +62,7 @@ DEPENDS_class-native = "\
     python3-tqdm-native \
     python3-jinja2-native \
     python3-native \
+    python3-monotonic-native \
 "
 
 ALTERNATIVE_${PN} += "conan"
