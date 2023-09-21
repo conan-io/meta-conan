@@ -34,6 +34,7 @@ def map_yocto_arch_to_conan_arch(d, arch_var):
     print("Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
     return ret
 
+do_install[network] = "1"
 conan_do_install() {
     rm -rf ${WORKDIR}/.conan
     if [ ${CONAN_CONFIG_URL} ]; then
