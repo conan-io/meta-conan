@@ -1,11 +1,11 @@
 SUMMARY = "Conan C/C++ package manager"
 HOMEPAGE = "https://conan.io"
-AUTHOR = "JFrog LTD <luism@jfrog.com>"
+AUTHOR = "JFrog LTD <info@conan.io>"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=1e486b3d16485847635c786d2b7bd32a"
 
-SRC_URI[md5sum] = "bf8f76b70de869b167a739d75f7b46dd"
-SRC_URI[sha256sum] = "11ed86b8f6ddf83d48a8a2a8688c2b24b7a391b3d7dd7a3dd2cde7650b11a955"
+SRC_URI[md5sum] = "00e7631ca11eeb3d8072f4586aaf1196"
+SRC_URI[sha256sum] = "f9129ae26c4e025c344e7d34e2afaedc924298da6810136a2b7e542143c6638c"
 
 inherit setuptools3 python3-dir pypi update-alternatives
 
