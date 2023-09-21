@@ -34,6 +34,7 @@ def map_yocto_arch_to_conan_arch(d, arch_var):
     print("Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
     return ret
 
+do_install[network] = "1"
 conan_do_install() {
     rm -rf ${WORKDIR}/.conan
     if [ ${CONAN_CONFIG_URL} ]; then
@@ -72,16 +73,18 @@ EOF
 
     echo "Using profile:"
     echo ${CONAN_PROFILE_PATH}
-    conan profile show ${CONAN_PROFILE_PATH}
+    conan profile show -pr ${CONAN_PROFILE_PATH}
 
     if [ "${CONAN_USER}" ]; then
         for NAME in ${CONAN_REMOTE_NAME}
         do
-            conan user -p ${CONAN_PASSWORD} -r ${NAME} ${CONAN_USER}
+            conan remote login -p "${CONAN_PASSWORD}" "${NAME}" "${CONAN_USER}"
         done
     fi
-    conan install ${CONAN_PKG} --profile ${CONAN_PROFILE_PATH} -if ${D}
+    conan install --requires=${CONAN_PKG} --profile ${CONAN_PROFILE_PATH} -of ${D}
     rm -f ${D}/deploy_manifest.txt
+    rm -f ${D}/deactivate_*.sh
+    rm -f ${D}/conan*.sh
 }
 
 EXPORT_FUNCTIONS do_compile do_install
