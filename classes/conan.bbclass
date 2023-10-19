@@ -18,6 +18,18 @@ conan_do_compile() {
  :
 }
 
+def get_native_var(d, nat_var):
+    env = d.getVar("BB_ORIGENV", False)
+    var = env.getVar(nat_var, False)
+    return (var if var is not None else "")
+
+def get_native_proxies(d):
+    ret = ' '.join((f'ALL_PROXY=\"{get_native_var(d, "ALL_PROXY")}\" ',
+                    f'HTTPS_PROXY=\"{get_native_var(d, "HTTPS_PROXY")}\" ',
+                    f'HTTP_PROXY=\"{get_native_var(d, "HTTP_PROXY")}\" ',
+                    f'NO_PROXY=\"{get_native_var(d, "NO_PROXY")}\"'))
+    return ret
+
 def map_yocto_arch_to_conan_arch(d, arch_var):
     arch = d.getVar(arch_var)
     ret = {"aarch64": "armv8",
@@ -74,6 +86,11 @@ EOF
     echo ${CONAN_PROFILE_PATH}
     conan profile show ${CONAN_PROFILE_PATH}
 
+    NATIVE_PROXIES="${@get_native_proxies(d)}"
+    for PROXY in ${NATIVE_PROXIES}
+    do
+        export ${PROXY}
+    done
     for NAME in ${CONAN_REMOTE_NAME}
     do
         conan user -p ${CONAN_PASSWORD} -r ${NAME} ${CONAN_USER}
@@ -82,4 +99,5 @@ EOF
     rm -f ${D}/deploy_manifest.txt
 }
 
+do_install[vardepsexclude] += "conan_do_install"
 EXPORT_FUNCTIONS do_compile do_install
