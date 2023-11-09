@@ -11,15 +11,12 @@ inherit setuptools3 python3-dir pypi update-alternatives
 
 # INFO: Overwrite the script to disable run-time dependency checking
 
-#do_install:append(){
-do_configure:append(){
-    rm ${D}${bindir}/conan
-    cat >> ${D}${bindir}/conan <<EOF
-#!/usr/bin/env ${PYTHON_PN}
-from conans.conan import run
-run()
-EOF
-    chmod 755 ${D}${bindir}/conan
+do_install:append(){
+    rm -f "${D}${bindir}/conan"
+    echo "#!/usr/bin/env ${PYTHON_PN}" > "${D}${bindir}/conan"
+    echo "from conans.conan import run" >> "${D}${bindir}/conan"
+    echo "run()" >> "${D}${bindir}/conan"
+    chmod 755 "${D}${bindir}/conan"
 }
 
 RDEPENDS:${PN} = "\
@@ -60,5 +57,5 @@ ALTERNATIVE_TARGET[conan] = "${bindir}/conan"
 BBCLASSEXTEND = "native nativesdk"
 
 do_install:append:class-native() {
-        sed -i -e 's|^#!.*/usr/bin/env ${PYTHON_PN}|#! /usr/bin/env nativepython3|' ${D}${bindir}/conan
+    sed -i -e 's|^#!.*/usr/bin/env ${PYTHON_PN}|#! /usr/bin/env nativepython3|' "${D}${bindir}/conan"
 }

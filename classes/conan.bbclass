@@ -65,7 +65,7 @@ conan_do_install() {
         echo "WARN: No Conan configuration URL provided, using Conan local cache."
     fi
     if [ -n "${CONAN_REMOTE_URLS}" ]; then
-        if [ ${#CONAN_REMOTE_URLS[@]} -ne ${#CONAN_REMOTE_NAMES[@]} ]; then
+        if [ "${#CONAN_REMOTE_URLS[@]}" -ne "${#CONAN_REMOTE_NAMES[@]}" ]; then
             echo "ERROR: number of CONAN_REMOTE_URLS does not equal number of CONAN_REMOTE_NAMES"
             echo "CONAN_REMOTE_URLS size: ${#CONAN_REMOTE_URLS[@]}"
             echo "CONAN_REMOTE_NAMES size: ${#CONAN_REMOTE_NAMES[@]}"
@@ -74,7 +74,7 @@ conan_do_install() {
         fi
         echo "INFO: Configuring the Conan remotes: ${CONAN_REMOTE_NAMES}"
         for ((i=0; i<${#CONAN_REMOTE_NAMES[@]}; i++)); do
-            conan romote add "${CONAN_REMOTE_NAMES[$i]}" "${CONAN_REMOTE_URLS[$i]}"
+            conan remote add --force --index=0 "${CONAN_REMOTE_NAMES[$i]}" "${CONAN_REMOTE_URLS[$i]}"
         done
     else
         echo "WARN: No Conan remotes provided (CONAN_REMOTE_URLS), using Conan default remotes."
@@ -85,25 +85,10 @@ conan_do_install() {
     fi
     cc_major=$(${CC} -dumpfullversion | cut -d'.' -f1)
     conan profile detect --name="${CONAN_PROFILE_BUILD_PATH}"
-    cat <<EOF > "${CONAN_PROFILE_HOST_PATH}"
-[settings]
-os=${HOST_OS}
-arch=${@map_yocto_arch_to_conan_arch(d, 'HOST_ARCH')}
-compiler=gcc
-compiler.version=${cc_major}
-compiler.cppstd=${@map_yocto_cc_to_conan_cppstd(d, ${cc_major})}
-compiler.libcxx=libstdc++11
-build_type=${build_type}
-[options]
-${CONAN_PROFILE_HOST_OPTIONS}
-[conf]
-tools.build:compiler_executables: {'c': "${CC}", 'cpp': "${CXX}"}
-core:non_interactive=1
-EOF
 
     echo "INFO: Using build profile: ${CONAN_PROFILE_BUILD_PATH}"
     echo "INFO: Using host profile: ${CONAN_PROFILE_HOST_PATH}"
-    conan profile show -pr:h=${CONAN_PROFILE_HOST_PATH} -pr:b=${CONAN_PROFILE_BUILD_PATH}
+    conan profile show -pr:h="${CONAN_PROFILE_HOST_PATH}" -pr:b="${CONAN_PROFILE_BUILD_PATH}"
 
     for remote_name in ${CONAN_REMOTE_NAMES}; do
         remote_name_upper="${remote_name^^}"
@@ -111,7 +96,6 @@ EOF
         password=''
         if [[ -v "${CONAN_LOGIN_USERNAME}_${remote_name_upper}" ]]; then
             username="${CONAN_LOGIN_USERNAME}_${remote_name_upper}"
-        fi
         elif [[ -v "${CONAN_LOGIN_USERNAME}" ]]; then
             username="${CONAN_LOGIN_USERNAME}"
         fi
@@ -123,7 +107,6 @@ EOF
 
         if [[ -v "${CONAN_PASSWORD}_${remote_name_upper}" ]]; then
             password="${CONAN_PASSWORD}_${remote_name_upper}"
-        fi
         elif [[ -v "${CONAN_PASSWORD}" ]]; then
             password="${CONAN_PASSWORD}"
         fi
