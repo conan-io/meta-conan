@@ -12,10 +12,12 @@ inherit setuptools3 python3-dir pypi update-alternatives
 # INFO: Overwrite the script to disable run-time dependency checking
 
 do_install:append(){
-    rm -f "${D}${bindir}/conan"
-    echo "#!/usr/bin/env ${PYTHON_PN}" > "${D}${bindir}/conan"
-    echo "from conans.conan import run" >> "${D}${bindir}/conan"
-    echo "run()" >> "${D}${bindir}/conan"
+    rm "${D}${bindir}/conan"
+    cat >> "${D}${bindir}/conan" <<EOF
+#!/usr/bin/env ${PYTHON_PN}
+from conans.conan import run
+run()
+EOF
     chmod 755 "${D}${bindir}/conan"
 }
 

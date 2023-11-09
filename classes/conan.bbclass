@@ -15,7 +15,7 @@ DEPENDS:append = " python3-conan-native"
 S = "${WORKDIR}"
 
 export CONAN_HOME="${WORKDIR}/.conan"
-export CONAN_DEFAULT_PROFILE="${WORKDIR}/profiles/meta_build"
+export CONAN_DEFAULT_PROFILE="${CONAN_HOME}/profiles/meta_build"
 
 # Need this because we do not use GNU_HASH in the conan builds
 # INSANE_SKIP:${PN} = "ldflags"
@@ -31,30 +31,6 @@ conan_do_compile() {
  :
 }
 
-def map_yocto_arch_to_conan_arch(d, arch_var):
-    arch = d.getVar(arch_var)
-    ret = {"aarch64": "armv8",
-           "armv5e": "armv5el",
-           "core2-64": "x86_64",
-           "cortexa8hf-neon": "armv7hf",
-           "arm": "armv7hf",
-           "i586": "x86",
-           "i686": "x86",
-           "mips32r2": "mips",
-           "mips64": "mips64",
-           "ppc7400": "ppc32"
-           }.get(arch, arch)
-    print("INFO: Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
-    return ret
-
-def map_yocto_cc_to_conan_cppstd(d, cc_version):
-    cc_version = int(cc_version)
-    cppstd = "gnu98" if cc_version < 6 else "gnu14"
-    if cc_version >= 11:
-        cppstd = "gnu17"
-    print("INFO: GCC major '{}' mapped compiler.cppstd to '{}'".format(cc_version, cppstd))
-    return cppstd
-
 do_install[network] = "1"
 conan_do_install() {
     rm -rf "${CONAN_HOME}"
@@ -65,7 +41,7 @@ conan_do_install() {
         echo "WARN: No Conan configuration URL provided, using Conan local cache."
     fi
     if [ -n "${CONAN_REMOTE_URLS}" ]; then
-        if [ "${#CONAN_REMOTE_URLS[@]}" -ne "${#CONAN_REMOTE_NAMES[@]}" ]; then
+        if [ ${#CONAN_REMOTE_URLS[@]} -ne ${#CONAN_REMOTE_NAMES[@]} ]; then
             echo "ERROR: number of CONAN_REMOTE_URLS does not equal number of CONAN_REMOTE_NAMES"
             echo "CONAN_REMOTE_URLS size: ${#CONAN_REMOTE_URLS[@]}"
             echo "CONAN_REMOTE_NAMES size: ${#CONAN_REMOTE_NAMES[@]}"
@@ -73,8 +49,10 @@ conan_do_install() {
             exit 1
         fi
         echo "INFO: Configuring the Conan remotes: ${CONAN_REMOTE_NAMES}"
-        for ((i=0; i<${#CONAN_REMOTE_NAMES[@]}; i++)); do
+        index=0
+        while [ $index -lt ${#CONAN_REMOTE_NAMES[@]} ]; do
             conan remote add --force --index=0 "${CONAN_REMOTE_NAMES[$i]}" "${CONAN_REMOTE_URLS[$i]}"
+            ((index++))
         done
     else
         echo "WARN: No Conan remotes provided (CONAN_REMOTE_URLS), using Conan default remotes."
