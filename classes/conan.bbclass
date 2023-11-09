@@ -31,6 +31,38 @@ conan_do_compile() {
  :
 }
 
+def map_yocto_arch_to_conan_arch(d, arch_var):
+    arch = d.getVar(arch_var)
+    ret = {"aarch64": "armv8",
+           "armv5e": "armv5el",
+           "core2-64": "x86_64",
+           "cortexa8hf-neon": "armv7hf",
+           "arm": "armv7hf",
+           "i586": "x86",
+           "i686": "x86",
+           "mips32r2": "mips",
+           "mips64": "mips64",
+           "ppc7400": "ppc32"
+           }.get(arch, arch)
+    print("Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
+    return ret
+
+def map_yocto_arch_to_conan_arch(d, arch_var):
+    arch = d.getVar(arch_var)
+    ret = {"aarch64": "armv8",
+           "armv5e": "armv5el",
+           "core2-64": "x86_64",
+           "cortexa8hf-neon": "armv7hf",
+           "arm": "armv7hf",
+           "i586": "x86",
+           "i686": "x86",
+           "mips32r2": "mips",
+           "mips64": "mips64",
+           "ppc7400": "ppc32"
+           }.get(arch, arch)
+    print("Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
+    return ret
+
 do_install[network] = "1"
 conan_do_install() {
     rm -rf "${CONAN_HOME}"
