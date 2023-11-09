@@ -47,25 +47,24 @@ def map_yocto_arch_to_conan_arch(d, arch_var):
     print("Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
     return ret
 
-def map_yocto_arch_to_conan_arch(d, arch_var):
-    arch = d.getVar(arch_var)
-    ret = {"aarch64": "armv8",
-           "armv5e": "armv5el",
-           "core2-64": "x86_64",
-           "cortexa8hf-neon": "armv7hf",
-           "arm": "armv7hf",
-           "i586": "x86",
-           "i686": "x86",
-           "mips32r2": "mips",
-           "mips64": "mips64",
-           "ppc7400": "ppc32"
-           }.get(arch, arch)
-    print("Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
-    return ret
+def map_yocto_cc_to_conan_cppstd(d, cc_version):
+    cc_version = int(cc_version)
+    cppstd = "gnu98" if cc_version < 6 else "gnu14"
+    if cc_version >= 11:
+        cppstd = "gnu17"
+    print("INFO: GCC major '{}' mapped compiler.cppstd to '{}'".format(cc_version, cppstd))
+    return cppstd
+
+def map_yocto_cc_to_conan_libcxx(d, cc_version):
+    cc_version = int(cc_version)
+    libcxx = "libstdc++" if cc_version < 5 else "libstdc++11"
+    print("INFO: GCC major '{}' mapped compiler.libstd to '{}'".format(cc_version, libcxx))
+    return libcxx
 
 do_install[network] = "1"
 conan_do_install() {
     rm -rf "${CONAN_HOME}"
+    echo 'core:non_interactive=1' > "${CONAN_HOME}/global.conf"
     if [ -n "${CONAN_CONFIG_URL}" ]; then
         echo "Installing Conan configuration from: ${CONAN_CONFIG_URL}"
         conan config install "${CONAN_CONFIG_URL}"
@@ -94,7 +93,25 @@ conan_do_install() {
         build_type="Debug"
     fi
     cc_major=$(${CC} -dumpfullversion | cut -d'.' -f1)
+    cc_name=$(echo ${CC} | cut -d' ' -f1)
+    cxx_name=$(echo ${CXX} | cut -d' ' -f1)
     conan profile detect --name="${CONAN_PROFILE_BUILD_PATH}"
+    cat > "${CONAN_PROFILE_HOST_PATH}" <<EOF
+[settings]
+os=${HOST_OS}
+arch=${@map_yocto_arch_to_conan_arch(d, 'HOST_ARCH')}
+compiler=gcc
+compiler.version=${major}
+compiler.libcxx=${@map_yocto_cc_to_conan_libcxx(d, ${major})}
+compiler.cppstd=${@map_yocto_cc_to_conan_cppstd(d, ${major})}
+build_type=${build_type}
+[options]
+${CONAN_PROFILE_HOST_OPTIONS}
+[conf]
+tools.cmake.cmaketoolchain:generator=${OECMAKE_GENERATOR}
+tools.build:jobs=${PARALLEL_MAKE}
+tools.build:compiler_executables={'c': "${cc_name}", 'cpp': "${cxx_name}"}
+EOF
 
     echo "INFO: Using build profile: ${CONAN_PROFILE_BUILD_PATH}"
     echo "INFO: Using host profile: ${CONAN_PROFILE_HOST_PATH}"
