@@ -25,4 +25,23 @@ node('Linux') {
             '''
         }
     }
+
+    def yocto_builder_image = null
+    stage('Build yocto-builder docker image') {
+        yocto_builder_image = docker.build('yocto-builder', '-f .ci/yocto/Dockerfile .')
+    }
+
+    stage('Build yocto image') {
+        yocto_builder_image.inside {
+            sh '''
+            git clone git://git.yoctoproject.org/poky && cd poky
+            git checkout kirkstone
+            '''
+
+            sh '''
+            source oe-init-build-env
+            bitbake core-image-minimal
+            '''
+        }
+    }
 }
