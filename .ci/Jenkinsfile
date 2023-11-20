@@ -40,8 +40,8 @@ node('Linux') {
 
             sh '''#!/bin/bash
             cd poky
-            touch build/conf/sanity.conf
-            source oe-init-build-env && bitbake core-image-minimal
+            mkdir conf && touch conf/sanity.conf
+            source oe-init-build-env && bitbake -k core-image-minimal
             '''
         }
     }
