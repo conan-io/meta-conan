@@ -40,8 +40,7 @@ node('Linux') {
 
             sh '''#!/bin/bash
             cd poky
-            source oe-init-build-env
-            bitbake core-image-minimal
+            source oe-init-build-env && bitbake core-image-minimal
             '''
         }
     }
