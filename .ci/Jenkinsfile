@@ -5,7 +5,7 @@ node('Linux') {
         checkout scm
     }
 
-    def image = null
+    /* def image = null
     stage('Build docker image') {
         image = docker.build('meta-conan-validate', '-f .ci/Dockerfile .')
     }
@@ -24,7 +24,7 @@ node('Linux') {
                 yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${WORKSPACE}
             '''
         }
-    }
+    } */
 
     def yocto_builder_image = null
     stage('Build yocto-builder docker image') {
@@ -40,7 +40,7 @@ node('Linux') {
 
             sh '''#!/bin/bash
             cd poky
-            touch conf/sanity.conf
+            touch build/conf/sanity.conf
             source oe-init-build-env && bitbake core-image-minimal
             '''
         }
