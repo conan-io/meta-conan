@@ -21,12 +21,19 @@ RUN chmod a+x /usr/local/bin/repo
 # Create user "jenkins"
 # RUN id jenkins 2>/dev/null || useradd --uid 1000 --create-home jenkins
 
-RUN groupadd --gid 1000 build \
-    && useradd --uid 1000 --gid 1000 -m build
+#RUN groupadd --gid 1000 build \
+#    && useradd --uid 1000 --gid 1000 -m build
 # Create a non-root user that will perform the actual build
 #RUN id build 2>/dev/null || useradd --uid 30000 --create-home build
 #RUN apt-get install -y sudo
 #RUN echo "build ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
+
+RUN groupadd _1001 -g 1001 \
+    && groupadd _1000 -g 1000 \
+    && groupadd _2000 -g 2000 \
+    && groupadd _999 -g 999 \
+    && useradd -ms /bin/bash conan -g _1001 -G _1000,_2000,_999 \
+    && printf "conan:conan" | chpasswd
 
 # Fix error "Please use a locale setting which supports utf-8."
 # See https://wiki.yoctoproject.org/wiki/TipsAndTricks/ResolvingLocaleIssues
@@ -40,6 +47,6 @@ ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
-USER build
-WORKDIR /home/build
+USER conan
+WORKDIR /home/conan
 CMD "/bin/bash"
