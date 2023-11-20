@@ -38,7 +38,7 @@ node('Linux') {
             git checkout kirkstone
             '''
 
-            sh '''
+            sh '''#!/bin/bash
             source oe-init-build-env
             bitbake core-image-minimal
             '''
