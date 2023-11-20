@@ -9,7 +9,7 @@ RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y gawk wget git-core diffstat unzip texinfo gcc-multilib \
         build-essential chrpath socat cpio python3 python3-pip python3-pexpect python-is-python3 \
         xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
-        pylint3 xterm
+        pylint3 xterm xterm zstd liblz4-tool
 
 # Additional host packages required by poky/scripts/wic
 RUN apt-get install -y curl dosfstools mtools parted syslinux tree zip
@@ -19,12 +19,14 @@ RUN curl http://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/
 RUN chmod a+x /usr/local/bin/repo
 
 # Create user "jenkins"
-RUN id jenkins 2>/dev/null || useradd --uid 1000 --create-home jenkins
+# RUN id jenkins 2>/dev/null || useradd --uid 1000 --create-home jenkins
 
+RUN groupadd --gid 1000 build \
+    && useradd --uid 1000 --gid 1000 -m build
 # Create a non-root user that will perform the actual build
-RUN id build 2>/dev/null || useradd --uid 30000 --create-home build
-RUN apt-get install -y sudo
-RUN echo "build ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
+#RUN id build 2>/dev/null || useradd --uid 30000 --create-home build
+#RUN apt-get install -y sudo
+#RUN echo "build ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
 
 # Fix error "Please use a locale setting which supports utf-8."
 # See https://wiki.yoctoproject.org/wiki/TipsAndTricks/ResolvingLocaleIssues
@@ -41,7 +43,3 @@ ENV LANGUAGE en_US.UTF-8
 USER build
 WORKDIR /home/build
 CMD "/bin/bash"
-
-
-RUN sudo apt-get update -y
-RUN sudo apt-get install -y gawk wget git-core diffstat unzip texinfo gcc-multilib build-essential chrpath socat libsdl1.2-dev xterm zstd liblz4-tool
