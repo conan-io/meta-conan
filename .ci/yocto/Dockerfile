@@ -33,7 +33,8 @@ RUN groupadd _1001 -g 1001 \
     && groupadd _2000 -g 2000 \
     && groupadd _999 -g 999 \
     && useradd -ms /bin/bash conan -g _1001 -G _1000,_2000,_999 \
-    && printf "conan:conan" | chpasswd
+    && printf "conan:conan" | chpasswd \
+    && printf "conan ALL= NOPASSWD: ALL\\n" >> /etc/sudoers
 
 # Fix error "Please use a locale setting which supports utf-8."
 # See https://wiki.yoctoproject.org/wiki/TipsAndTricks/ResolvingLocaleIssues

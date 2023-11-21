@@ -32,7 +32,7 @@ node('Linux') {
     }
 
     stage('Build yocto image') {
-        yocto_builder_image.inside {
+        yocto_builder_image.inside("--user conan") {
             sh '''
             git clone git://git.yoctoproject.org/poky && cd poky
             git checkout kirkstone
