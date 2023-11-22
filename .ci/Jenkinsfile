@@ -28,18 +28,17 @@ node('Linux') {
 
     def yocto_builder_image = null
     stage('Build yocto-builder docker image') {
-        yocto_builder_image = docker.build("conan-io/yocto-builder:${env.BUILD_ID}", '-f .ci/yocto/Dockerfile .')
+        sh "docker build -t conan-io/yocto-builder:${env.BUILD_ID} -f .ci/yocto/Dockerfile ."
     }
 
     stage('Build yocto image') {
-        yocto_builder_image.inside {
-            sh 'su - conan'
-            sh 'git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky'
-            sh 'mkdir poky/conf && touch poky/conf/sanity.conf'
-            sh '''#!/bin/bash
-            source poky/oe-init-build-env
-            bitbake -k core-image-minimal
-            '''
+        try {
+            sh "docker run -d --name yocto-builder-${env.BUILD_ID} conan-io/yocto-builder:${env.BUILD_ID} tail -f /dev/null"
+            sh "docker exec -it yocto-builder-${env.BUILD_ID} /bin/bash -c 'git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky'"
+            sh "docker exec -it yocto-builder-${env.BUILD_ID} /bin/bash -c 'mkdir poky/conf && touch poky/conf/sanity.conf'"
+            sh "docker exec -it yocto-builder-${env.BUILD_ID} /bin/bash -c 'source poky/oe-init-build-env && bitbake -k core-image-minimal'"
+        } finally {
+            sh "docker rm -f yocto-builder-${env.BUILD_ID} || true"
         }
     }
 }
