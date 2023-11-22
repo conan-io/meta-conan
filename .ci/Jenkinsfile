@@ -28,7 +28,7 @@ node('Linux') {
 
     def yocto_builder_image = null
     stage('Build yocto-builder docker image') {
-        sh "docker build -t conan-io/yocto-builder:${env.BUILD_ID} -f .ci/yocto/Dockerfile ."
+        sh "docker build -t conan-io/yocto-builder:${env.BUILD_ID} .ci/yocto/"
     }
 
     stage('Build yocto image') {
