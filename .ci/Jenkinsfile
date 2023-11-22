@@ -33,7 +33,7 @@ node('Linux') {
 
     stage('Build yocto image') {
         try {
-            sh "docker run -d --name yocto-builder-${env.BUILD_ID} conan-io/yocto-builder:${env.BUILD_ID} tail -f /dev/null"
+            sh "docker run -d --name yocto-builder-${env.BUILD_ID} conan-io/yocto-builder:${env.BUILD_ID}"
             sh "docker exec -it yocto-builder-${env.BUILD_ID} /bin/bash -c 'git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky'"
             sh "docker exec -it yocto-builder-${env.BUILD_ID} /bin/bash -c 'mkdir poky/conf && touch poky/conf/sanity.conf'"
             sh "docker exec -it yocto-builder-${env.BUILD_ID} /bin/bash -c 'source poky/oe-init-build-env && bitbake -k core-image-minimal'"
