@@ -34,14 +34,10 @@ node('Linux') {
     stage('Build yocto image') {
         yocto_builder_image.inside {
             sh '''
-            git clone git://git.yoctoproject.org/poky && cd poky
-            git checkout kirkstone
-            '''
-
-            sh '''#!/bin/bash
-            cd poky
-            mkdir conf && touch conf/sanity.conf
-            source oe-init-build-env && bitbake -k core-image-minimal
+            git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky
+            mkdir poky/conf && touch poky/conf/sanity.conf
+            source poky/oe-init-build-env
+            bitbake -k core-image-minimal
             '''
         }
     }
