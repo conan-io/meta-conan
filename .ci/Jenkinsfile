@@ -39,8 +39,7 @@ node('Linux') {
 
             sh '''#!/bin/bash
             mkdir poky/conf && touch poky/conf/sanity.conf
-            source poky/oe-init-build-env
-            bitbake -k core-image-minimal
+            source poky/oe-init-build-env && bitbake -k core-image-minimal
             '''
         }
     }
