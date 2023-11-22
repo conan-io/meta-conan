@@ -28,16 +28,14 @@ node('Linux') {
 
     def yocto_builder_image = null
     stage('Build yocto-builder docker image') {
-        yocto_builder_image = docker.build('yocto-builder', '-f .ci/yocto/Dockerfile .')
+        yocto_builder_image = docker.build('conan-io/yocto-builder:${env.BUILD_ID}', '-f .ci/yocto/Dockerfile .')
     }
 
     stage('Build yocto image') {
         yocto_builder_image.inside {
-            sh '''
-            echo "USER: ${USER}"
-            echo "PWD: ${PWD}"
-            git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky
-            '''
+            sh 'echo "USER: ${USER}"'
+            sh 'echo "PWD: ${PWD}"'
+            sh 'git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky'
 
             sh '''#!/bin/bash
             mkdir poky/conf && touch poky/conf/sanity.conf
