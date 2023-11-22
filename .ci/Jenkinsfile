@@ -36,8 +36,10 @@ node('Linux') {
             sh 'su - conan'
             sh 'git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky'
             sh 'mkdir poky/conf && touch poky/conf/sanity.conf'
-            sh 'source poky/oe-init-build-env'
-            sh 'bitbake -k core-image-minimal'
+            sh '''#!/bin/bash
+            source poky/oe-init-build-env
+            bitbake -k core-image-minimal
+            '''
         }
     }
 }
