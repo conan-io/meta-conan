@@ -33,8 +33,7 @@ node('Linux') {
 
     stage('Build yocto image') {
         yocto_builder_image.inside {
-            sh "echo \"USER: ${USER}\""
-            sh "echo \"PWD: ${PWD}\""
+            sh "export"
             sh 'git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky'
 
             sh '''#!/bin/bash
