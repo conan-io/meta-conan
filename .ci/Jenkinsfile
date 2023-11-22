@@ -35,6 +35,9 @@ node('Linux') {
         yocto_builder_image.inside {
             sh '''
             git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky
+            '''
+
+            sh '''#!/bin/bash
             mkdir poky/conf && touch poky/conf/sanity.conf
             source poky/oe-init-build-env
             bitbake -k core-image-minimal
