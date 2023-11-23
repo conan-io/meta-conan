@@ -26,7 +26,7 @@ node('Linux') {
         }
     }
 
-/*     def yocto_builder_image = null
+    def yocto_builder_image = null
     stage('Build yocto-builder docker image') {
         sh "docker build -t conan-io/yocto-builder:${env.BUILD_ID} .ci/yocto/"
     }
@@ -41,5 +41,5 @@ node('Linux') {
             sh "docker rm -f yocto-builder-${env.BUILD_ID} || true"
             sh "docker rmi -f conan-io/yocto-builder:${env.BUILD_ID} || true"
         }
-    } */
+    }
 }

@@ -18,16 +18,6 @@ RUN apt-get install -y --no-install-suggests --no-install-recommends curl dosfst
 RUN curl http://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo
 RUN chmod a+x /usr/local/bin/repo
 
-# Create user "jenkins"
-# RUN id jenkins 2>/dev/null || useradd --uid 1000 --create-home jenkins
-
-#RUN groupadd --gid 1000 build \
-#    && useradd --uid 1000 --gid 1000 -m build
-# Create a non-root user that will perform the actual build
-#RUN id build 2>/dev/null || useradd --uid 30000 --create-home build
-#RUN apt-get install -y sudo
-#RUN echo "build ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
-
 RUN groupadd _1001 -g 1001 \
     && groupadd _1000 -g 1000 \
     && groupadd _2000 -g 2000 \
