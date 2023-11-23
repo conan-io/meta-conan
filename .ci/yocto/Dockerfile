@@ -9,7 +9,7 @@ RUN apt-get -qq update && apt-get -y upgrade
 RUN apt-get install -y --no-install-suggests --no-install-recommends gawk wget git-core diffstat unzip texinfo gcc-multilib \
         build-essential chrpath socat cpio python3 python3-pip python3-pexpect python-is-python3 \
         xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
-        pylint3 xterm xterm zstd liblz4-tool
+        pylint3 xterm xterm zstd liblz4-tool file sudo
 
 # Additional host packages required by poky/scripts/wic
 RUN apt-get install -y --no-install-suggests --no-install-recommends curl dosfstools mtools parted syslinux tree zip
@@ -17,6 +17,16 @@ RUN apt-get install -y --no-install-suggests --no-install-recommends curl dosfst
 # Add "repo" tool (used by many Yocto-based projects)
 RUN curl http://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo
 RUN chmod a+x /usr/local/bin/repo
+
+# Create user "jenkins"
+# RUN id jenkins 2>/dev/null || useradd --uid 1000 --create-home jenkins
+
+#RUN groupadd --gid 1000 build \
+#    && useradd --uid 1000 --gid 1000 -m build
+# Create a non-root user that will perform the actual build
+#RUN id build 2>/dev/null || useradd --uid 30000 --create-home build
+#RUN apt-get install -y sudo
+#RUN echo "build ALL=(ALL) NOPASSWD: ALL" | tee -a /etc/sudoers
 
 RUN groupadd _1001 -g 1001 \
     && groupadd _1000 -g 1000 \
