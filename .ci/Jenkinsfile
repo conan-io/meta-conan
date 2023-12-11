@@ -10,19 +10,23 @@ node('Linux') {
         image = docker.build('meta-conan-validate', '-f .ci/Dockerfile .')
     }
 
+    branchName = env.CHANGE_TARGET ? env.CHANGE_TARGET : "kirkstone"
+    branchName = branchName == "master" ? "kirksone" : branchName
+    echo "Using branch name as yocto version: ${branchName}"
+
     stage('Validate Yocto layer') {
         image.inside {
-            sh '''
+            sh """
                 whoami
                 WORKSPACE=${PWD}
-                git clone --depth 1 git://git.yoctoproject.org/poky -b dunfell /tmp/poky
-                git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b dunfell /tmp/meta-openembedded
+                git clone --depth 1 git://git.yoctoproject.org/poky -b ${branchName} /tmp/poky
+                git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${branchName} /tmp/meta-openembedded
                 cd /tmp/poky/
                 . /tmp/poky/oe-init-build-env
                 touch conf/sanity.conf
                 cd /tmp/meta-openembedded
                 yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${WORKSPACE}
-            '''
+            """
         }
     }
 
@@ -33,11 +37,8 @@ node('Linux') {
 
     stage('Build yocto image') {
         try {
-            branchName = env.CHANGE_TARGET ? env.CHANGE_TARGET : "kirkstone"
-            branchName = branchName == "main" ? "kirksone" : branchName
-            echo "Using branch name as yocto version: ${branchName}"
             sh "docker run -d -t --name yocto-builder-${env.BUILD_ID} conan-io/yocto-builder:${env.BUILD_ID}"
-            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky'"
+            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'git clone --branch ${branchName} --depth 1 git://git.yoctoproject.org/poky'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'mkdir poky/conf && touch poky/conf/sanity.conf'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'source poky/oe-init-build-env && bitbake -k core-image-minimal'"
         } finally {
