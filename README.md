@@ -29,3 +29,7 @@ This layer depends on the `meta-python` layer: https://layers.openembedded.org/l
 License
 -------
 [MIT](https://github.com/conan-io/conan/blob/develop/LICENSE.md)
+
+Maintainer
+----------
+[conan.io](https://conan.io)
