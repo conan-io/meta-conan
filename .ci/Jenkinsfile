@@ -33,6 +33,9 @@ node('Linux') {
 
     stage('Build yocto image') {
         try {
+            branchName = env.CHANGE_TARGET ? env.CHANGE_TARGET : "kirkstone"
+            branchName = branchName == "main" ? "kirksone" : branchName
+            echo "Using branch name as yocto version: ${branchName}"
             sh "docker run -d -t --name yocto-builder-${env.BUILD_ID} conan-io/yocto-builder:${env.BUILD_ID}"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'git clone --branch kirkstone --depth 1 git://git.yoctoproject.org/poky'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'mkdir poky/conf && touch poky/conf/sanity.conf'"
