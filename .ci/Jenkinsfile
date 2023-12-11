@@ -11,7 +11,7 @@ node('Linux') {
     }
 
     branchName = env.CHANGE_TARGET ? env.CHANGE_TARGET : "kirkstone"
-    branchName = branchName == "master" ? "kirksone" : branchName
+    branchName = branchName == "master" ? "kirkstone" : branchName
     echo "Using branch name as yocto version: ${branchName}"
 
     stage('Validate Yocto layer') {
