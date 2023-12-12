@@ -26,10 +26,15 @@ Requirements
 This layer depends on the `meta-python` layer: https://layers.openembedded.org/layerindex/branch/thud/layer/meta-python/
 
 
+Contributing
+------------
+
+Please submit any patches against the `meta-conan` layer by using the GitHub pull-request feature. Use the default branch (currently `kirkstone`) as base branch.
+
 License
 -------
 [MIT](https://github.com/conan-io/conan/blob/develop/LICENSE.md)
 
 Maintainer
 ----------
-[conan.io](https://conan.io)
+[conan.io](https://conan.io) (info@conan.io)
