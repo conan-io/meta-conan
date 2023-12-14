@@ -1,16 +1,16 @@
 SUMMARY = "Conan C/C++ package manager"
 HOMEPAGE = "https://conan.io"
-AUTHOR = "JFrog LTD <luism@jfrog.com>"
+AUTHOR = "JFrog LTD <info@conan.io>"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=1e486b3d16485847635c786d2b7bd32a"
 
-SRC_URI[md5sum] = "fa77ba5ea986075a12b5eb62bb65f93c"
-SRC_URI[sha256sum] = "338e0cd9b814bc36f9c01bc9cc535629786abaa8a67759526aa08c329a219a24"
+SRC_URI[md5sum] = "00e7631ca11eeb3d8072f4586aaf1196"
+SRC_URI[sha256sum] = "f9129ae26c4e025c344e7d34e2afaedc924298da6810136a2b7e542143c6638c"
 
 inherit setuptools3 python3-dir pypi update-alternatives
 
 # Overwrite the script to disable run-time dependency checking
-do_install_append(){
+do_install:append(){
     rm ${D}${bindir}/conan
     cat >> ${D}${bindir}/conan <<EOF
 #!/usr/bin/env ${PYTHON_PN}
@@ -20,7 +20,7 @@ EOF
     chmod 755 ${D}${bindir}/conan
 }
 
-RDEPENDS_${PN} = "\
+RDEPENDS:${PN} = "\
     python3-pyjwt \
     python3-requests \
     python3-urllib3 \
@@ -42,7 +42,7 @@ RDEPENDS_${PN} = "\
     python3-sqlite3 \
 "
 
-DEPENDS_class-native = "\
+DEPENDS:class-native = "\
     python3-pyjwt-native \
     python3-requests-native \
     python3-urllib3-native \
@@ -64,13 +64,13 @@ DEPENDS_class-native = "\
     python3-native \
 "
 
-ALTERNATIVE_${PN} += "conan"
+ALTERNATIVE:${PN} += "conan"
 
 NATIVE_LINK_NAME[conan] = "${bindir}/conan"
 ALTERNATIVE_TARGET[conan] = "${bindir}/conan"
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_install_append_class-native() {
+do_install:append:class-native() {
         sed -i -e 's|^#!.*/usr/bin/env ${PYTHON_PN}|#! /usr/bin/env nativepython3|' ${D}${bindir}/conan
 }
