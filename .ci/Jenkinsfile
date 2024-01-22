@@ -41,6 +41,8 @@ node('Linux') {
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'git clone --branch ${branchName} --depth 1 git://git.yoctoproject.org/poky'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'mkdir poky/conf && touch poky/conf/sanity.conf'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'git clone --branch ${branchName} https://github.com/conan-io/meta-conan.git poky/meta-conan && git clone --branch ${branchName} https://github.com/openembedded/meta-openembedded.git poky/meta-openembedded'"
+            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash ls -la poky'"
+            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash ls -la poky/meta-openembedded'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'mkdir build'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer ../poky/meta-openembedded/meta-oe'"
