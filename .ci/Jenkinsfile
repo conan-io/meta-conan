@@ -45,9 +45,9 @@ node('Linux') {
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'ls -la poky/meta-openembedded'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'mkdir build'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env'"
-            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/build/poky/meta-openembedded/meta-oe'"
-            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/build/poky/meta-openembedded/meta-python'"
-            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/build/poky/meta-openembedded/meta-conan'"
+            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/poky/meta-openembedded/meta-oe'"
+            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/poky/meta-openembedded/meta-python'"
+            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/poky/meta-openembedded/meta-conan'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'source poky/oe-init-build-env && bitbake -k core-image-minimal build'"
         } finally {
             sh "docker rm -f yocto-builder-${env.BUILD_ID} || true"
