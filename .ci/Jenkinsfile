@@ -48,7 +48,7 @@ node('Linux') {
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/poky/meta-openembedded/meta-oe'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/poky/meta-openembedded/meta-python'"
             sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'cd build && source ../poky/oe-init-build-env && bitbake-layers add-layer /home/conan/poky/meta-conan'"
-            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'source poky/oe-init-build-env && bitbake -k core-image-minimal build'"
+            sh "docker exec -t yocto-builder-${env.BUILD_ID} /bin/bash -c 'source poky/oe-init-build-env && bitbake -k core-image-minimal'"
         } finally {
             sh "docker rm -f yocto-builder-${env.BUILD_ID} || true"
             sh "docker rmi -f conan-io/yocto-builder:${env.BUILD_ID} || true"
