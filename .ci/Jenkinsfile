@@ -14,21 +14,21 @@ node('Linux') {
     branchName = branchName == "master" ? "kirkstone" : branchName
     echo "Using branch name as yocto version: ${branchName}"
 
-    // stage('Validate Yocto layer') {
-    //     image.inside {
-    //         sh """
-    //             whoami
-    //             WORKSPACE=${PWD}
-    //             git clone --depth 1 git://git.yoctoproject.org/poky -b ${branchName} /tmp/poky
-    //             git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${branchName} /tmp/meta-openembedded
-    //             cd /tmp/poky/
-    //             . /tmp/poky/oe-init-build-env
-    //             touch conf/sanity.conf
-    //             cd /tmp/meta-openembedded
-    //             yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${WORKSPACE}
-    //         """
-    //     }
-    // }
+    stage('Validate Yocto layer') {
+        image.inside {
+            sh """
+                whoami
+                WORKSPACE=${PWD}
+                git clone --depth 1 git://git.yoctoproject.org/poky -b ${branchName} /tmp/poky
+                git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${branchName} /tmp/meta-openembedded
+                cd /tmp/poky/
+                . /tmp/poky/oe-init-build-env
+                touch conf/sanity.conf
+                cd /tmp/meta-openembedded
+                yocto-check-layer -d --dependency meta-oe meta-python --with-software-layer-signature-check ${WORKSPACE}
+            """
+        }
+    }
 
     def yocto_builder_image = null
     stage('Build yocto-builder docker image') {
