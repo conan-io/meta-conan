@@ -17,7 +17,7 @@ node('Linux') {
     stage('Validate Yocto layer') {
         image.inside {
             sh """
-                whoami
+                echo "BRANCH_NAME: ${BRANCH_NAME}"
                 WORKSPACE=${PWD}
                 git clone --depth 1 git://git.yoctoproject.org/poky -b ${branchName} /tmp/poky
                 git clone --depth 1 git://git.openembedded.org/meta-openembedded.git -b ${branchName} /tmp/meta-openembedded
