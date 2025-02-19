@@ -13,24 +13,28 @@ PV = "0.2.0"
 LICENSE = "MIT"
 DEPENDS:append = " python3-conan-native"
 S = "${WORKDIR}"
+# INFO: Use /usr/local to avoid conflicts with system packages
+prefix = "${base_prefix}/usr/local"
 
-export CONAN_HOME="${WORKDIR}/.conan"
-export CONAN_DEFAULT_PROFILE="${CONAN_HOME}/profiles/meta_build"
-
-# Need this because we do not use GNU_HASH in the conan builds
-# INSANE_SKIP:${PN} = "ldflags"
-
+CONAN_HOME="${TMPDIR}/.conan2"
+CONAN_LOGLEVEL ?= "status"
+CONAN_DEFAULT_PROFILE="${CONAN_HOME}/profiles/meta_build"
 CONAN_REMOTE_URL ?= ""
-CONAN_REMOTE_NAME ?= "conan-yocto"
+CONAN_REMOTE_NAME ?= ""
 CONAN_PROFILE_BUILD_PATH ?= "${CONAN_HOME}/profiles/meta_build"
 CONAN_PROFILE_HOST_PATH ?= "${CONAN_HOME}/profiles/meta_host"
+CONAN_SETTINGS_COMPILER_CPPSTD ?= "gnu17"
+CONAN_SETTINGS_COMPILER_LIBCXX ?= "libstdc++11"
 CONAN_CONFIG_URL ?= ""
-CONAN_PROFILE_HOST_OPTIONS ?= ""
+CONAN_PROFILE_HOST_OPTIONS ?= "*/*:shared=True"
 CONAN_BUILD_POLICY ?= "never"
+CONAN_SETTINGS_BUILD_TYPE ?= "${@'Debug' if d.getVar('DEBUG_BUILD') == '1' else 'Release'}"
+CONAN_EXTRA_CFLAGS ?= ""
+CONAN_EXTRA_CXXFLAGS ?= ""
 
-conan_do_compile() {
- :
-}
+export CONAN_HOME
+export CONAN_LOG_LEVEL="${CONAN_LOGLEVEL}"
+export CONAN_DEFAULT_PROFILE
 
 def map_yocto_arch_to_conan_arch(d, arch_var):
     arch = d.getVar(arch_var)
@@ -48,93 +52,131 @@ def map_yocto_arch_to_conan_arch(d, arch_var):
     bb.note("\nINFO: Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
     return ret
 
-do_install[network] = "1"
-conan_do_install() {
-    echo "INFO: Creating Conan home directory: ${CONAN_HOME}"
-    rm -rf "${CONAN_HOME}"
+def convert_flags_to_list(d, flags):
+    if not flags:
+        return "[]"
+    flag_list = flags.split()
+    quoted_flags = [f'\\"{flag}\\"' for flag in flag_list]
+    result = f'[{", ".join(quoted_flags)}]'
+    return str(result)
+
+do_configure[network] = "1"
+conan_do_configure() {
+    bbnote "Creating Conan home directory: ${CONAN_HOME}"
     mkdir -p "${CONAN_HOME}"
-    echo "INFO: Creating Conan configuration"
-    echo 'core:non_interactive=1' > "${CONAN_HOME}/global.conf"
+
+    bbnote "Creating Conan configuration"
+    printf "core:non_interactive=1\n" > "${CONAN_HOME}/conan.conf"
+    printf "core:default_build_profile=${CONAN_PROFILE_BUILD_PATH}\n" >> "${CONAN_HOME}/conan.conf"
+    printf "core:default_profile=${CONAN_PROFILE_HOST_PATH}\n" >> "${CONAN_HOME}/conan.conf"
+
     if [ -n "${CONAN_CONFIG_URL}" ]; then
-        echo "Installing Conan configuration from: ${CONAN_CONFIG_URL}"
+        bbnote "Installing Conan configuration from: ${CONAN_CONFIG_URL}"
         conan config install "${CONAN_CONFIG_URL}"
     else
-        echo "WARN: No Conan configuration URL provided, using Conan local cache."
+        bbnote "No Conan configuration URL provided, using Conan local cache."
     fi
 
     echo "INFO: Configuring Conan remotes"
     if [ -n "${CONAN_REMOTE_URL}" ]; then
         urls_size=$( echo ${CONAN_REMOTE_URL} | wc -w )
         names_size=$( echo ${CONAN_REMOTE_NAME} | wc -w )
-        echo "INFO: URLS SIZE: ${urls_size}"
-        echo "INFO: NAMES SIZE: ${names_size}"
+        bbdebug "Conan remote URLs size: ${urls_size}"
+        bbdebug "Conan remote names size: ${names_size}"
         if [ "${urls_size}" -ne "${names_size}" ]; then
-            echo "ERROR: number of CONAN_REMOTE_URL does not equal number of CONAN_REMOTE_NAME"
-            echo "CONAN_REMOTE_URL size: ${urls_size}"
-            echo "CONAN_REMOTE_NAME size: ${names_size}"
-            echo "Please, use empty space as separator for both variables."
+            bbfatal "Number of CONAN_REMOTE_URL (${urls_size}) does not equal number of CONAN_REMOTE_NAME (${names_size}).\nPlease, use empty space as separator for both variables."
             exit 1
         fi
         awk 'BEGIN{split("${CONAN_REMOTE_NAME}",a) split("${CONAN_REMOTE_URL}", b); for (i in a)
             system("conan remote add --force --index=0 " a[i] " " b[i]) }'
     else
-        echo "WARN: No Conan remotes provided (CONAN_REMOTE_URL), using Conan default remotes."
-    fi
-    build_type="Release"
-    if [ "${DEBUG_BUILD}" -eq "1" ]; then
-        build_type="Debug"
+        bbnote "No Conan remotes provided (CONAN_REMOTE_URL), using Conan default remotes."
     fi
     cc_major=$(${CC} -dumpfullversion | cut -d'.' -f1)
     cc_name=$(echo ${CC} | cut -d' ' -f1)
     cxx_name=$(echo ${CXX} | cut -d' ' -f1)
 
-    # TODO: libcxx and cppstd should be configurable
-    libcxx="libstdc++11"
-    cppstd="gnu17"
-    echo "INFO: Generating build profile"
-    conan profile detect --name="${CONAN_PROFILE_BUILD_PATH}"
-    echo "INFO: Generating host profile"
+    bbnote "Generating build profile for ${CONAN_PROFILE_BUILD_PATH}"
+    conan profile detect -f --name="${CONAN_PROFILE_BUILD_PATH}"
+
+    bbnote "Generating host profile for ${CONAN_PROFILE_HOST_PATH}"
+    formatted_cflags="${@convert_flags_to_list(d, '${CONAN_EXTRA_CFLAGS}')}"
+    formatted_cxxflags="${@convert_flags_to_list(d, '${CONAN_EXTRA_CXXFLAGS}')}"
     cat > "${CONAN_PROFILE_HOST_PATH}" <<EOF
 [settings]
 os=Linux
 arch=${@map_yocto_arch_to_conan_arch(d, 'HOST_ARCH')}
 compiler=gcc
 compiler.version=${cc_major}
-compiler.libcxx=${libcxx}
-compiler.cppstd=${cppstd}
-build_type=${build_type}
+compiler.libcxx=${CONAN_SETTINGS_COMPILER_LIBCXX}
+compiler.cppstd=${CONAN_SETTINGS_COMPILER_CPPSTD}
+build_type=${CONAN_SETTINGS_BUILD_TYPE}
 [options]
 ${CONAN_PROFILE_HOST_OPTIONS}
+[conf]
+tools.build:cxxflags=${formatted_cxxflags}
+tools.build:cflags=${formatted_cflags}
 EOF
 
-    echo "INFO: Using build profile: ${CONAN_PROFILE_BUILD_PATH}"
-    echo "INFO: Using host profile: ${CONAN_PROFILE_HOST_PATH}"
+    bbnote "Profile configuration:"
     conan profile show -pr:h="${CONAN_PROFILE_HOST_PATH}" -pr:b="${CONAN_PROFILE_BUILD_PATH}"
 
     for remote_name in ${CONAN_REMOTE_NAME}; do
+        echo "INFO: Logging in to remote '${remote_name}'"
         remote_name_upper=$(echo "${remote_name}" | tr '[a-z]' '[A-Z]' | tr '-' '_')
         if [ -z "${CONAN_LOGIN_USERNAME}" ]; then
-            echo "ERROR: No username provided for remote '${remote_name}'."
-            echo "Please set CONAN_LOGIN_USERNAME."
+            bbfatal "No username provided for remote '${remote_name}'. Please set CONAN_LOGIN_USERNAME."
             exit 1
         fi
         if [ -z "${CONAN_PASSWORD}" ]; then
-            echo "ERROR: No password provided for remote '${remote_name}'."
-            echo "Please set CONAN_PASSWORD_${remote_name_upper} or CONAN_PASSWORD."
+            bbfatal "No password provided for remote '${remote_name}'. Please set CONAN_PASSWORD_${remote_name_upper} or CONAN_PASSWORD."
             exit 1
         fi
 
-        echo "INFO: Logging in to remote '${remote_name}' as '${CONAN_LOGIN_USERNAME}'"
+        bbnote "Logging in to remote '${remote_name}' as '${CONAN_LOGIN_USERNAME}'"
         conan remote login -p "${CONAN_PASSWORD}" "${remote_name}" "${CONAN_LOGIN_USERNAME}"
     done
-
-    # TODO: Generate a conanfile.txt with all dependencies
-    # TODO: Generators and Deploy ???
-    echo "INFO: Installing packages for ${CONAN_PKG}"
-    conan install --requires="${CONAN_PKG}" -pr:h="${CONAN_PROFILE_HOST_PATH}" -pr:b="${CONAN_PROFILE_BUILD_PATH}" --build="${CONAN_BUILD_POLICY}" -of "${D}"
-    rm -f ${D}/deploy_manifest.txt
-    rm -f ${D}/deactivate_*.sh
-    rm -f ${D}/conan*.sh
 }
 
-EXPORT_FUNCTIONS do_compile do_install
+do_compile[network] = "1"
+conan_do_compile() {
+    bbnote "Building package ${CONAN_PKG}"
+    conan install --update --requires=${CONAN_PKG} \
+        -pr:h="${CONAN_PROFILE_HOST_PATH}" \
+        -pr:b="${CONAN_PROFILE_BUILD_PATH}" \
+        --build=${CONAN_BUILD_POLICY}
+}
+
+conan_do_install() {
+    # TODO: Move to Conan runtime_deploy after having it fixed and copying symlinks
+    conan install -nr --requires=${CONAN_PKG} \
+        -pr:h="${CONAN_PROFILE_HOST_PATH}" \
+        -pr:b="${CONAN_PROFILE_BUILD_PATH}" \
+        --deployer=full_deploy \
+        --deployer-folder=${S}/deploy
+
+    if [ -n "$(find ${S}/deploy -name '*.so*')" ]; then
+        install -d ${D}${libdir}
+        find ${S}/deploy -name '*.so*' -exec mv {} ${D}${libdir}/ \;
+    fi
+
+    if [ -n "$(find ${S}/deploy -type d -name 'bin')" ]; then
+        install -d ${D}${bindir}
+        for bin in $(find ${S}/deploy -type d -name 'bin'); do
+            mv ${bin}/* ${D}${bindir}/
+        done
+    fi
+
+    install -d ${D}/etc/ld.so.conf.d
+    printf "${prefix}/lib\n" > ${D}/etc/ld.so.conf.d/conan.conf
+}
+
+conan_do_clean() {
+    if [ "${CLEAN_CONAN_CACHE}" = "1" ]; then
+        bbnote "Cleaning Conan cache..."
+        conan cache clean
+    fi
+}
+
+FILES:${PN} += "${prefix}/lib/* ${prefix}/bin/*"
+EXPORT_FUNCTIONS do_configure do_compile do_install do_clean
