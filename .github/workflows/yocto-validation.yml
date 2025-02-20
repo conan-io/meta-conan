@@ -11,11 +11,6 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Disable AppArmor
-      run: |
-        sudo systemctl stop apparmor
-        sudo systemctl disable apparmor
-
     - name: Extract Yocto release name
       run: |
         BRANCH_NAME=${GITHUB_REF#refs/heads/}
@@ -75,6 +70,7 @@ jobs:
         echo 'CONAN_BUILD_POLICY = "missing"' >> conf/local.conf
 
         bitbake-layers show-layers
+        bitbake -p
 
     - name: Build target
       run: |
