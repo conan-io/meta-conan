@@ -58,6 +58,9 @@ jobs:
 
     - name: Setup build environment
       run: |
+        mkdir -p ${{ github.workspace }}/conf
+        mkdir -p ${{ github.workspace }}/build/conf
+
         echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> ${{ github.workspace }}/conf/local.conf
         echo 'CONAN_BUILD_POLICY = "missing"' >> ${{ github.workspace }}/conf/local.conf
 
