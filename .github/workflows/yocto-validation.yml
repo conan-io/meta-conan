@@ -8,12 +8,13 @@ on:
 
 jobs:
   validate-layer:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Disable AppArmor
       run: |
         sudo systemctl stop apparmor
+        sudo systemctl disable apparmor
 
     - name: Extract Yocto release name
       run: |
