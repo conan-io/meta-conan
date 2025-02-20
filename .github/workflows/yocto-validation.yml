@@ -62,7 +62,7 @@ jobs:
 
         bitbake-layers add-layer ../meta-openembedded/meta-oe
         bitbake-layers add-layer ../meta-openembedded/meta-python
-        bitbake-layers add-layer ../meta-conan
+        bitbake-layers add-layer ../
 
         echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> conf/local.conf
         echo 'CONAN_BUILD_POLICY = "missing"' >> conf/local.conf
