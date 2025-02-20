@@ -58,29 +58,13 @@ jobs:
 
     - name: Setup build environment
       run: |
-        mkdir -p ${{ github.workspace }}/conf
-        mkdir -p ${{ github.workspace }}/build/conf
-
-        echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> ${{ github.workspace }}/conf/local.conf
-        echo 'CONAN_BUILD_POLICY = "missing"' >> ${{ github.workspace }}/conf/local.conf
-
         source poky/oe-init-build-env build
 
         echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> ${{ github.workspace }}/build/conf/local.conf
         echo 'CONAN_BUILD_POLICY = "missing"' >> ${{ github.workspace }}/build/conf/local.conf
-
-        cp ${{ github.workspace }}/../conf/layer.conf ${{ github.workspace }}/conf/layer.conf
 
         bitbake-layers add-layer ../meta-openembedded/meta-oe
         bitbake-layers add-layer ../meta-openembedded/meta-python
         bitbake-layers add-layer ../
 
         bitbake-layers show-layers
-        bitbake -p
-
-    - name: Build target
-      env:
-        MACHINE: qemux86-64
-      run: |
-        source poky/oe-init-build-env build
-        bitbake conan-mosquitto -k
