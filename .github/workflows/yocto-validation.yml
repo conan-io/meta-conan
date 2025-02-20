@@ -65,6 +65,6 @@ jobs:
 
         bitbake-layers add-layer ../meta-openembedded/meta-oe
         bitbake-layers add-layer ../meta-openembedded/meta-python
-        bitbake-layers add-layer ../
+        bitbake-layers add-layer ../meta-conan
 
         bitbake-layers show-layers
