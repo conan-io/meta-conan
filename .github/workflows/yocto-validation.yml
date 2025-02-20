@@ -50,8 +50,9 @@ jobs:
 
     - name: Add Conan Mosquitto example
       run: |
-        mkdir -p $GITHUB_WORKSPACE/recipes-example
-        cp $GITHUB_WORKSPACE/.github/workflows/conan-mosquitto_2.0.18.bb $GITHUB_WORKSPACE/recipes-example/
+        ls -R ${{ github.workspace }}
+        mkdir -p ${{ github.workspace }}/recipes-example
+        cp ${{ github.workspace }}/.github/workflows/conan-mosquitto_2.0.18.bb ${{ github.workspace }}/recipes-example/
 
     - name: Setup build environment
       run: |
