@@ -67,7 +67,7 @@ jobs:
         echo 'PARALLEL_MAKE = "-j ${@oe.utils.cpu_count()}"' >> conf/local.conf
         echo 'BB_NUMBER_THREADS = "${@oe.utils.cpu_count()}"' >> conf/local.conf
         echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> conf/local.conf
-        echo 'CONAN_BUILD_POLICY = "missing"' >> conf/local.conf'
+        echo 'CONAN_BUILD_POLICY = "missing"' >> conf/local.conf
 
         bitbake-layers show-layers
         bitbake -p
