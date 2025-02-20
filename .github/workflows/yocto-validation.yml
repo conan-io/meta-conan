@@ -52,9 +52,9 @@ jobs:
       run: |
         mkdir recipes-example
         echo 'inherit conan' >> recipes-example/conan-mosquitto_2.0.18.bb
-        echo 'DESCRIPTION = "An open source MQTT broker"' >> recipes-example/conan-mosquitto_2.0.18.bb'
-        echo 'LICENSE = "EPL-1.0"' >> recipes-example/conan-mosquitto_2.0.18.bb'
-        echo 'CONAN_PKG = "mosquitto/2.0.18"' >> recipes-example/conan-mosquitto_2.0.18.bb'
+        echo 'DESCRIPTION = "An open source MQTT broker"' >> recipes-example/conan-mosquitto_2.0.18.bb
+        echo 'LICENSE = "EPL-1.0"' >> recipes-example/conan-mosquitto_2.0.18.bb
+        echo 'CONAN_PKG = "mosquitto/2.0.18"' >> recipes-example/conan-mosquitto_2.0.18.bb
 
     - name: Setup build environment
       run: |
