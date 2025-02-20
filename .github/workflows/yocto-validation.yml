@@ -58,10 +58,13 @@ jobs:
 
     - name: Setup build environment
       run: |
-        echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> conf/local.conf
-        echo 'CONAN_BUILD_POLICY = "missing"' >> conf/local.conf
+        echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> ${{ github.workspace }}/conf/local.conf
+        echo 'CONAN_BUILD_POLICY = "missing"' >> ${{ github.workspace }}/conf/local.conf
 
         source poky/oe-init-build-env build
+
+        echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> ${{ github.workspace }}/build/conf/local.conf
+        echo 'CONAN_BUILD_POLICY = "missing"' >> ${{ github.workspace }}/build/conf/local.conf
 
         bitbake-layers add-layer ../meta-openembedded/meta-oe
         bitbake-layers add-layer ../meta-openembedded/meta-python
