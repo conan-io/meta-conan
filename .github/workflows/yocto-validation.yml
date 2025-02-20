@@ -1,0 +1,70 @@
+name: Yocto Layer Validation
+
+on:
+  push:
+    branches: [ 'conan2/*' ]
+  pull_request:
+    branches: [ 'conan2/*' ]
+
+jobs:
+  validate-layer:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Extract Yocto release name
+      run: |
+        BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          if [[ $BRANCH_NAME == "conan2/"* ]]; then
+            YOCTO_RELEASE=$(echo $BRANCH_NAME | cut -d'/' -f2)
+          else
+            YOCTO_RELEASE=$(echo $GITHUB_BASE_REF | cut -d'/' -f2)
+          fi
+          echo "YOCTO_RELEASE=$YOCTO_RELEASE" >> $GITHUB_ENV
+
+    - name: Checkout meta-conan
+      uses: actions/checkout@v3
+      with:
+        path: meta-conan
+
+    - name: Install dependencies
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get -qq install -y --no-install-recommends --no-install-suggests \
+          gawk wget git diffstat unzip texinfo gcc build-essential \
+          chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
+          iputils-ping python3-git python3-jinja2 libegl1-mesa-dev libsdl1.2-dev pylint xterm
+
+    - name: Clone Poky
+      run: |
+        git clone -b ${{ env.YOCTO_RELEASE }} --depth 1 git://git.yoctoproject.org/poky
+        cd poky
+        git checkout -q ${{ env.YOCTO_RELEASE }}
+
+    - name: Clone meta-openembedded
+      run: |
+        git clone -b ${{ env.YOCTO_RELEASE }} --depth 1 git://git.openembedded.org/meta-openembedded
+        cd meta-openembedded
+        git checkout -q ${{ env.YOCTO_RELEASE }}
+
+    - name: Add Conan Mosquitto example
+      run: |
+        mkdir recipes-example
+        echo 'inherit conan' > recipes-example/conan-mosquitto_2.0.18.bb
+        echo 'DESCRIPTION = "An open source MQTT broker"' >> recipes-example/conan-mosquitto_2.0.18.bb
+        echo 'LICENSE = "EPL-1.0"' >> recipes-example/conan-mosquitto_2.0.18.bb
+        echo 'CONAN_PKG = "mosquitto/2.0.18"' >> recipes-example/conan-mosquitto_2.0.18.bb
+
+    - name: Setup build environment
+      run: |
+        source poky/oe-init-build-env build
+
+        echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> ${{ github.workspace }}/build/conf/local.conf
+        echo 'CONAN_BUILD_POLICY = "missing"' >> ${{ github.workspace }}/build/conf/local.conf
+
+        bitbake-layers add-layer ../meta-openembedded/meta-oe
+        bitbake-layers add-layer ../meta-openembedded/meta-python
+        bitbake-layers add-layer ../meta-conan
+
+        bitbake-layers show-layers

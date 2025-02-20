@@ -9,7 +9,7 @@
 # GitHub Repository: https://github.com/conan-io/meta-conan
 # Issues: https://github.com/conan-io/meta-conan/issues
 
-PV = "0.2.0"
+PV = "0.3.0"
 LICENSE = "MIT"
 DEPENDS:append = " python3-conan-native"
 S = "${WORKDIR}"
