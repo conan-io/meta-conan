@@ -1,0 +1,71 @@
+name: Yocto Layer Validation
+
+on:
+  push:
+    branches: [ 'conan2/*' ]
+  pull_request:
+    branches: [ 'conan2/*' ]
+
+jobs:
+  validate-layer:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Extract Yocto release name
+      run: |
+        BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          if [[ $BRANCH_NAME == "conan2/"* ]]; then
+            YOCTO_RELEASE=$(echo $BRANCH_NAME | cut -d'/' -f2)
+          else
+            YOCTO_RELEASE=$(echo $GITHUB_BASE_REF | cut -d'/' -f2)
+          fi
+          echo "YOCTO_RELEASE=$YOCTO_RELEASE" >> $GITHUB_ENV
+
+    - name: Checkout meta-conan
+      uses: actions/checkout@v3
+      with:
+        path: meta-conan
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gawk wget git diffstat unzip texinfo gcc build-essential \
+        chrpath socat cpio python3 python3-pip python3-pexpect xz-utils debianutils \
+        iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev pylint xterm
+
+    - name: Clone Poky
+      run: |
+        git clone -b ${{ env.YOCTO_RELEASE }} git://git.yoctoproject.org/poky
+        cd poky
+        git checkout -q ${{ env.YOCTO_RELEASE }}
+
+    - name: Clone meta-openembedded
+      run: |
+        git clone -b ${{ env.YOCTO_RELEASE }} git://git.openembedded.org/meta-openembedded
+        cd meta-openembedded
+        git checkout -q ${{ env.YOCTO_RELEASE }}
+
+    - name: Add Conan Mosquitto example
+      run: |
+        mkdir -p recipes-example
+        cp .github/workflows/conan-mosquitto_2.0.18.bb recipes-example/
+
+    - name: Setup build environment
+      run: |
+        source poky/oe-init-build-env build
+
+        bitbake-layers add-layer ../meta-openembedded/meta-oe
+        bitbake-layers add-layer ../meta-conan
+
+        echo 'PARALLEL_MAKE = "-j ${@oe.utils.cpu_count()}"' >> conf/local.conf
+        echo 'BB_NUMBER_THREADS = "${@oe.utils.cpu_count()}"' >> conf/local.conf
+        echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> conf/local.conf
+        echo 'CONAN_BUILD_POLICY = "missing"' >> conf/local.conf'
+
+        bitbake-layers show-layers
+        bitbake -p
+
+    - name: Build target
+      run: |
+        source poky/oe-init-build-env build
+        MACHINE=qemux86-64 bitbake conan-mosquitto -k
