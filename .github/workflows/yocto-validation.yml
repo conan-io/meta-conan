@@ -69,6 +69,8 @@ jobs:
         echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> ${{ github.workspace }}/build/conf/local.conf
         echo 'CONAN_BUILD_POLICY = "missing"' >> ${{ github.workspace }}/build/conf/local.conf
 
+        cp ${{ github.workspace }}/conf/layer.conf ${{ github.workspace }}/build/conf/layer.conf
+
         bitbake-layers add-layer ../meta-openembedded/meta-oe
         bitbake-layers add-layer ../meta-openembedded/meta-python
         bitbake-layers add-layer ../
