@@ -63,19 +63,17 @@ jobs:
     - name: Setup build environment
       run: |
         source poky/oe-init-build-env build
-        pwd
 
         bitbake-layers add-layer ../meta-openembedded/meta-oe
         bitbake-layers add-layer ../meta-openembedded/meta-python
         bitbake-layers add-layer ../meta-conan
 
-        echo 'PARALLEL_MAKE = "-j ${@oe.utils.cpu_count()}"' > conf/local.conf
+        echo 'PARALLEL_MAKE = "-j ${@oe.utils.cpu_count()}"' >> conf/local.conf
         echo 'BB_NUMBER_THREADS = "${@oe.utils.cpu_count()}"' >> conf/local.conf
         echo 'IMAGE_INSTALL:append = " conan-mosquitto"' >> conf/local.conf
         echo 'CONAN_BUILD_POLICY = "missing"' >> conf/local.conf
 
         bitbake-layers show-layers
-        bitbake -p
 
     - name: Build target
       run: |
