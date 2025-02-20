@@ -38,20 +38,20 @@ jobs:
 
     - name: Clone Poky
       run: |
-        git clone -b ${{ env.YOCTO_RELEASE }} git://git.yoctoproject.org/poky
+        git clone -b ${{ env.YOCTO_RELEASE }} --depth 1 git://git.yoctoproject.org/poky
         cd poky
         git checkout -q ${{ env.YOCTO_RELEASE }}
 
     - name: Clone meta-openembedded
       run: |
-        git clone -b ${{ env.YOCTO_RELEASE }} git://git.openembedded.org/meta-openembedded
+        git clone -b ${{ env.YOCTO_RELEASE }} --depth 1 git://git.openembedded.org/meta-openembedded
         cd meta-openembedded
         git checkout -q ${{ env.YOCTO_RELEASE }}
 
     - name: Add Conan Mosquitto example
       run: |
-        mkdir -p recipes-example
-        cp .github/workflows/conan-mosquitto_2.0.18.bb recipes-example/
+        mkdir -p $GITHUB_WORKSPACE/recipes-example
+        cp $GITHUB_WORKSPACE/.github/workflows/conan-mosquitto_2.0.18.bb $GITHUB_WORKSPACE/recipes-example/
 
     - name: Setup build environment
       run: |
