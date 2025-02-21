@@ -3,8 +3,16 @@ name: Yocto Layer Validation
 on:
   push:
     branches: [ 'conan2/*' ]
+    paths:
+      - '**'
+      - '!README.md'
+      - '!LICENSE.md'
   pull_request:
     branches: [ 'conan2/*' ]
+    paths:
+      - '**'
+      - '!README.md'
+      - '!LICENSE.md'
 
 jobs:
   validate-layer:
