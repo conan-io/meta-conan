@@ -27,10 +27,11 @@ CONAN_SETTINGS_COMPILER_CPPSTD ?= "gnu17"
 CONAN_SETTINGS_COMPILER_LIBCXX ?= "libstdc++11"
 CONAN_CONFIG_URL ?= ""
 CONAN_PROFILE_HOST_OPTIONS ?= "*/*:shared=True"
-CONAN_BUILD_POLICY ?= "never"
+CONAN_BUILD_POLICY ?= "missing"
 CONAN_SETTINGS_BUILD_TYPE ?= "${@'Debug' if d.getVar('DEBUG_BUILD') == '1' else 'Release'}"
-CONAN_EXTRA_CFLAGS ?= ""
-CONAN_EXTRA_CXXFLAGS ?= ""
+CONAN_EXTRA_CFLAGS ?= "${TUNE_CCARGS}"
+CONAN_EXTRA_CXXFLAGS ?= "${TUNE_CCARGS}"
+CONAN_EXTRA_CONFIG ?= ""
 
 export CONAN_HOME
 export CONAN_LOG_LEVEL="${CONAN_LOGLEVEL}"
@@ -49,7 +50,7 @@ def map_yocto_arch_to_conan_arch(d, arch_var):
            "mips64": "mips64",
            "ppc7400": "ppc32"
            }.get(arch, arch)
-    bb.note("\nINFO: Arch value '{}' from '{}' mapped to '{}'".format(arch, arch_var, ret))
+    bb.debug(1, f"INFO: Arch value '{arch}' from '{arch_var}' mapped to '{ret}'")
     return ret
 
 def convert_flags_to_list(d, flags):
@@ -58,6 +59,13 @@ def convert_flags_to_list(d, flags):
     flag_list = flags.split()
     quoted_flags = [f'\\"{flag}\\"' for flag in flag_list]
     result = f'[{", ".join(quoted_flags)}]'
+    return str(result)
+
+def convert_list_to_lines(d, list_var):
+    if not list_var:
+        return ""
+    list_items = list_var.split()
+    result = "\n".join(list_items)
     return str(result)
 
 do_configure[network] = "1"
@@ -102,6 +110,7 @@ conan_do_configure() {
     bbnote "Generating host profile for ${CONAN_PROFILE_HOST_PATH}"
     formatted_cflags="${@convert_flags_to_list(d, '${CONAN_EXTRA_CFLAGS}')}"
     formatted_cxxflags="${@convert_flags_to_list(d, '${CONAN_EXTRA_CXXFLAGS}')}"
+    formatted_ldflags="${@convert_flags_to_list(d, '${LDFLAGS}')}"
     cat > "${CONAN_PROFILE_HOST_PATH}" <<EOF
 [settings]
 os=Linux
@@ -112,10 +121,15 @@ compiler.libcxx=${CONAN_SETTINGS_COMPILER_LIBCXX}
 compiler.cppstd=${CONAN_SETTINGS_COMPILER_CPPSTD}
 build_type=${CONAN_SETTINGS_BUILD_TYPE}
 [options]
-${CONAN_PROFILE_HOST_OPTIONS}
+${@convert_list_to_lines(d, '${CONAN_PROFILE_HOST_OPTIONS}')}
 [conf]
 tools.build:cxxflags=${formatted_cxxflags}
 tools.build:cflags=${formatted_cflags}
+tools.build:sysroot=${RECIPE_SYSROOT}
+tools.build:compiler_executables={'c': '${cc_name}', 'cpp': '${cxx_name}'}
+tools.build:compiler_executables={'c': '${cc_name}', 'cpp': '${cxx_name}'}
+tools.build:sharedlinkflags=${formatted_ldflags}
+${@convert_list_to_lines(d, '${CONAN_EXTRA_CONFIG}')}
 EOF
 
     bbnote "Profile configuration:"
