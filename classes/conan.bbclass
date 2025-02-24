@@ -32,6 +32,7 @@ CONAN_SETTINGS_BUILD_TYPE ?= "${@'Debug' if d.getVar('DEBUG_BUILD') == '1' else 
 CONAN_EXTRA_CFLAGS ?= "${TUNE_CCARGS}"
 CONAN_EXTRA_CXXFLAGS ?= "${TUNE_CCARGS}"
 CONAN_EXTRA_CONFIG ?= ""
+CONAN_CONF_SOURCES_DOWNLOAD_CACHE ?= "${CONAN_HOME}/download_cache"
 
 export CONAN_HOME
 export CONAN_LOG_LEVEL="${CONAN_LOGLEVEL}"
@@ -77,6 +78,7 @@ conan_do_configure() {
     printf "core:non_interactive=1\n" > "${CONAN_HOME}/conan.conf"
     printf "core:default_build_profile=${CONAN_PROFILE_BUILD_PATH}\n" >> "${CONAN_HOME}/conan.conf"
     printf "core:default_profile=${CONAN_PROFILE_HOST_PATH}\n" >> "${CONAN_HOME}/conan.conf"
+    printf "core.sources:download_cache=${CONAN_CONF_SOURCES_DOWNLOAD_CACHE}\n" >> "${CONAN_HOME}/conan.conf"
 
     if [ -n "${CONAN_CONFIG_URL}" ]; then
         bbnote "Installing Conan configuration from: ${CONAN_CONFIG_URL}"
