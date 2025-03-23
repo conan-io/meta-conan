@@ -91,8 +91,8 @@ conan_do_configure() {
     if [ -n "${CONAN_REMOTE_URL}" ]; then
         urls_size=$( echo ${CONAN_REMOTE_URL} | wc -w )
         names_size=$( echo ${CONAN_REMOTE_NAME} | wc -w )
-        bbdebug "Conan remote URLs size: ${urls_size}"
-        bbdebug "Conan remote names size: ${names_size}"
+        bbdebug 1 "Conan remote URLs size: ${urls_size}"
+        bbdebug 1 "Conan remote names size: ${names_size}"
         if [ "${urls_size}" -ne "${names_size}" ]; then
             bbfatal "Number of CONAN_REMOTE_URL (${urls_size}) does not equal number of CONAN_REMOTE_NAME (${names_size}).\nPlease, use empty space as separator for both variables."
             exit 1
